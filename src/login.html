@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Homework Reminder</title>
+    <link rel="stylesheet" href="login.css">
+  </head>
+  <body>
+    <div class="nav">
+      <div class="item selected" id="login">User</div>
+      <div class="item" id="school" onclick="redirect(event)">School Reminders</div>
+      <div class="item" id="personal" onclick="redirect(event)">Personal Reminders</div>
+      <div class="item" id="settings" onclick="redirect(event)">Settings</div>
+    </div>
+    <div class="container">
+      <img class="logo" src="../assets/HomeworkDesktopIcon.png"></img>
+      <h1 id="title">Login</h1>
+    </div>
+    <div class="container">
+      <div class="button" onclick="logClick()">
+        <img class="discord" src="../assets/Discord.png"></img>
+        <h3 class="text" id="text">Login with Discord</h2>
+      </div>
+    </div>
+    <footer>
+      Made by Steve S
+    </footer>
+    <script type="text/javascript" src="loggedIn.js"></script>
+    <script type="text/javascript" src="login.js"></script>
+  </body>
+</html>
