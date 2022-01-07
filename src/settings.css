@@ -14,7 +14,9 @@ body {
   height: 2.5rem;
 }
 .container {
-  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .item {
   flex-basis: 100%;
@@ -29,6 +31,142 @@ body {
 }
 .selected {
   background-color: #4F628E;
+}
+.settings {
+  flex-direction: column;
+}
+.startup {
+  border-radius: 30px;
+  height: 2.5rem;
+  width: 30%;
+  margin-bottom: 2rem;
+  background-color: rgb(75, 81, 94);
+  color: white;
+}
+.startupText {
+  padding-right: 0.8rem;
+  text-align: center;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  transform: translateY(1px);
+}
+.switch > input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+.switch > input:checked + .slider {
+  background-color: #1196F3;
+}
+.switch > input:checked + .slider:before {
+  -webkit-transform: translateX(18px);
+  -ms-transform: translateX(18px);
+  transform: translateX(18px);
+}
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+.roles {
+  display: flex;
+  flex-direction: column;
+  height: 58vh;
+  width: 80%;
+  background-color: rgb(75, 81, 94);
+  color: white;
+}
+.list {
+  height: 100%;
+  width: 92%;
+  background-color: rgb(92, 99, 114);
+  overflow-y: auto;
+}
+.list::-webkit-scrollbar-track
+{
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background: transparent;
+}
+
+.list::-webkit-scrollbar
+{
+  height: 20px;
+	width: 12px;
+	background: transparent;
+}
+
+.list::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+.role {
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: 1px solid black;
+  background: rgba(255, 0, 0, 0.5);
+}
+.roleCheck > input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  width: 1.15em;
+  height: 1.15em;
+  color: white;
+  border: 0.15em solid white;
+  border-radius: 0.15em;
+  display: grid;
+  place-content: center;
+}
+.roleCheck > input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em white;
+  transform-origin: bottom left;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.roleCheck > input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+.roleName {
+  padding-left: 1rem;
+  font-size: 1em;
+  background: transparent;
 }
 footer {
   display: flex; 

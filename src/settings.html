@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Homework Reminder</title>
     <link rel="stylesheet" href="settings.css">
-    <script type="text/javascript" src="loggedIn.js"></script>
   </head>
   <body>
     <div class="nav">
@@ -16,9 +15,24 @@
     <div class="container">
       <h1 class="title">Settings</h1>
     </div>
+    <div class="container settings">
+      <div class="container startup">
+        <h4 class="startupText">Open App on Startup</h3>
+        <label class="switch">
+          <input id="check" type="checkbox" onclick="startup(event)">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="container roles">
+        <h3>Select Roles to be Notified For:</h1>
+        <div id="roles" class="list">
+        </div>
+      </div>
+    </div>
     <footer>
       Made by Steve S
     </footer>
     <script type="text/javascript" src="loggedIn.js"></script>
+    <script type="text/javascript" src="settings.js"></script>
   </body>
 </html>

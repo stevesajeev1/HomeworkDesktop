@@ -3,6 +3,7 @@ const path = require('path');
 const { MongoClient } = require('mongodb');
 const settings = require('electron-settings');
 const https = require('https');
+const AutoLaunch = require('auto-launch');
 const secrets = require(path.join(__dirname, '../secrets.json'));
 
 const clientID = secrets.clientID;
@@ -56,7 +57,29 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+  if (!settings.hasSync('startup')) {
+    settings.setSync('startup', true);
+  }
+  let autoLaunch = new AutoLaunch({
+    name: 'Homework Desktop',
+    path: app.getPath('exe'),
+  });
+  if (settings.getSync('startup')) {
+    autoLaunch.isEnabled().then((isEnabled) => {
+      if (!isEnabled) {
+        autoLaunch.enable();
+      }
+    });
+  } else {
+    autoLaunch.isEnabled().then((isEnabled) => {
+      if (isEnabled) {
+        autoLaunch.disable();
+      }
+    });
+  }
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -123,6 +146,7 @@ ipcMain.on('oauth', (event, arg) => {
       }
       const req = https.request(options, res => {
         if (res.statusCode != 200) {
+          console.log("auth failed");
           authWindow.close();
           authWindow = null;
           return;
@@ -146,6 +170,9 @@ ipcMain.on('oauth', (event, arg) => {
           }
           const idReq = https.request(idOptions, res => {
             if (res.statusCode != 200) {
+              console.log("id failed");
+              authWindow.close();
+              authWindow = null;
               return;
             }
 
@@ -170,6 +197,10 @@ ipcMain.on('oauth', (event, arg) => {
               }
               const rolesReq = https.request(rolesOptions, res => {
                 if (res.statusCode != 200) {
+                  console.log("roles failed");
+                  authWindow.close();
+                  authWindow = null;
+                  settings.unset('token');
                   return;
                 }
     
@@ -183,10 +214,8 @@ ipcMain.on('oauth', (event, arg) => {
                   successfulAuth = true;
                   authWindow.close();
                   authWindow = null;
-                  var roles = data.toString().split(" ");
-                  var obj = settings.getSync('token');
-                  obj.roles = roles;
-                  settings.setSync('token', obj);
+                  var roles = JSON.parse(data.toString());
+                  settings.setSync('roles', roles);
                 })
               })
               
@@ -224,6 +253,8 @@ ipcMain.on('oauth', (event, arg) => {
 // Logout
 ipcMain.on('logout', (event, arg) => {
   settings.unset('token');
+  settings.unset('personal');
+  settings.unset('roles');
 })
 
 // Get personal
@@ -286,6 +317,7 @@ ipcMain.on('personalComplete', (event, arg) => {
     if (res.statusCode != 200) {
       successfulAuth = false;
       settings.unset('personal');
+      settings.unset('token');
       event.sender.send('personalReply', null, true);
       return;
     }
@@ -295,7 +327,7 @@ ipcMain.on('personalComplete', (event, arg) => {
   });
   req.write(data);
   req.end();
-  
+
   // Clear from array
   personalArray.shift();
   if (personalArray.length == 0) {
@@ -333,6 +365,44 @@ ipcMain.on('personalEdit', (event, arg1, arg2, arg3) => {
   console.log(personalArray);
   settings.setSync('personal', personalArray);
   event.sender.send('personalReply', JSON.stringify(settings.getSync('personal')));
+})
+
+// Reply with if startup is enabled or change startup value
+ipcMain.on('startup', (event, arg) => {
+  if (arg != null) {
+    settings.setSync('startup', arg);
+    let autoLaunch = new AutoLaunch({
+      name: 'Homework Desktop',
+      path: app.getPath('exe'),
+    });
+    if (settings.getSync('startup')) {
+      autoLaunch.isEnabled().then((isEnabled) => {
+        if (!isEnabled) {
+          autoLaunch.enable();
+        }
+      });
+    } else {
+      autoLaunch.isEnabled().then((isEnabled) => {
+        if (isEnabled) {
+          autoLaunch.disable();
+        }
+      });
+    }
+  } else {
+    if (!settings.hasSync('startup')) {
+      settings.setSync('startup', false);
+    }
+  }
+  event.sender.send('startupReply', settings.getSync('startup'), settings.getSync('roles'));
+})
+
+// Role personalization changed
+ipcMain.on('roleChange', (event, arg1, arg2) => {
+  var roles = settings.getSync('roles');
+  var targetRole = roles[arg1];
+  targetRole.user = arg2;
+  roles[arg1] = targetRole;
+  settings.setSync('roles', roles);
 })
 
 // Discord rich presence

@@ -45,6 +45,7 @@
     }
   },
   "dependencies": {
+    "auto-launch": "^5.0.5",
     "btoa": "^1.2.1",
     "discord-urpc": "^1.0.1",
     "electron-settings": "^4.0.2",
