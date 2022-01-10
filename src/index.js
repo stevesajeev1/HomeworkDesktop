@@ -10,6 +10,32 @@ const clientID = secrets.clientID;
 const clientSecret = secrets.clientSecret;
 const mongoPassword = secrets.mongoPassword;
 
+// Initialize MongoDB
+const uri = `mongodb+srv://SteveS:${mongoPassword}@homeworkdesktop.i6fzb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// listen for updates in the reminders
+client.connect(err => {
+  const reminderCollection = client.db("homework").collection("reminders");
+  startWatcher(reminderCollection);
+});
+
+function startWatcher (collection) {
+  console.log('starting watcher');
+  let watcher = collection.watch().on("change", (changeEvent) => {
+    if (mainWindow.webContents.getURL().endsWith("school.html")) {
+      mainWindow.reload();
+    }
+  }).on('error', e => {
+    console.error('watcher died');
+
+    //close current connection
+    watcher.cursor.close();
+
+    //restart new watcher
+    startWatcher(collection);
+  });
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -44,15 +70,12 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, 'login.html'));
   }
   mainWindow.setMenuBarVisibility(false);
-};
 
-// const uri = `mongodb+srv://SteveS:${mongoPassword}@homeworkdesktop.i6fzb.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
+  // close db connection if open
+  mainWindow.on('close', async function () {
+    await client.close();
+  })
+};
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -318,6 +341,7 @@ ipcMain.on('personalComplete', (event, arg) => {
       successfulAuth = false;
       settings.unset('personal');
       settings.unset('token');
+      settings.unset('roles');
       event.sender.send('personalReply', null, true);
       return;
     }
@@ -362,7 +386,6 @@ ipcMain.on('personalEdit', (event, arg1, arg2, arg3) => {
   personalArray.sort(function(a, b) {
     return new Date(a.date) - new Date(b.date);
   })
-  console.log(personalArray);
   settings.setSync('personal', personalArray);
   event.sender.send('personalReply', JSON.stringify(settings.getSync('personal')));
 })
@@ -403,6 +426,122 @@ ipcMain.on('roleChange', (event, arg1, arg2) => {
   targetRole.user = arg2;
   roles[arg1] = targetRole;
   settings.setSync('roles', roles);
+})
+
+// Send details necessary for school reminders
+ipcMain.on('school', async (event, arg) => {
+  if (arg) {
+    settings.setSync('schoolSort', !settings.getSync('schoolSort'));
+  }
+  // Check if user is moderator
+  client.connect(err => {
+    (async () => {
+      const modCollection = client.db("homework").collection("moderators");
+      const mods = await modCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      var isMod = mods.mods.includes(settings.getSync('token').id);
+      const reminderCollection = client.db("homework").collection("reminders");
+      var reminders = await reminderCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      reminders = reminders.reminders;
+      if (!settings.hasSync("schoolSort")) {
+        settings.setSync("schoolSort", true);
+      }
+      var sort = settings.getSync("schoolSort");
+      var roles = settings.getSync("roles");
+      event.sender.send('schoolReply', isMod, reminders, sort, roles);
+    })();
+  });
+})
+
+// School reminder time reached
+ipcMain.on('schoolComplete', (event, arg) => {
+  client.connect(err => {
+    (async () => {
+      const reminderCollection = client.db("homework").collection("reminders");
+      var reminders = await reminderCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      reminders = reminders.reminders;
+      // Get earliest reminder
+      reminders.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+      })
+      // Send notification
+      if (process.platform === "win32") {
+        app.setAppUserModelId("Homework Desktop");
+      } 
+      const notif = {
+        title: 'School Reminder',
+        body: 'Reminder for now: ' + reminders[0].name,
+        icon: path.join(__dirname, '../assets/HomeworkDesktopIcon.png')
+      }
+      new Notification(notif).show();
+    })();
+  });
+})
+
+// Create school reminder
+ipcMain.on('createSchool', (event, arg1, arg2, arg3) => {
+  client.connect(err => {
+    (async () => {
+      var name = arg1;
+      var date = Date.parse(arg2);
+      var roleID = arg3;
+      const reminderCollection = client.db("homework").collection("reminders");
+      var reminders = await reminderCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      reminders = reminders.reminders;
+      var reminder = {
+        roleID: roleID,
+        name: name,
+        date: date
+      }
+      // Update reminders
+      reminders.push(reminder);
+      reminderCollection.findOneAndUpdate({}, { $set: {reminders: reminders }}).catch(err => console.error(`Failed to find document: ${err}`));
+    })();
+  });
+});
+
+// School reminder was edited
+// Personal reminder was edited
+ipcMain.on('schoolEdit', (event, arg1, arg2, arg3, arg4) => {
+  client.connect(err => {
+    (async () => {
+      var id = arg1;
+      var date = arg2;
+      var name = arg3;
+      var roleID = arg4;
+      const reminderCollection = client.db("homework").collection("reminders");
+      var reminders = await reminderCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      reminders = reminders.reminders;
+      reminders.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+      })
+      var reminder = {
+        roleID: roleID,
+        name: name,
+        date: date
+      }
+      reminders[id] = reminder;
+      // Update reminders
+      reminderCollection.findOneAndUpdate({}, { $set: {reminders: reminders }}).catch(err => console.error(`Failed to find document: ${err}`));
+    })();
+  });
+})
+
+// School reminder was edited
+// Personal reminder wants to be delete
+ipcMain.on('schoolDelete', (event, arg) => {
+  client.connect(err => {
+    (async () => {
+      const reminderCollection = client.db("homework").collection("reminders");
+      var reminders = await reminderCollection.findOne().catch(err => console.error(`Failed to find document: ${err}`));
+      reminders = reminders.reminders;
+      reminders.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+      })
+      // Update reminders
+      reminders.splice(parseInt(arg), 1);
+      reminderCollection.findOneAndUpdate({}, { $set: {reminders: reminders }}).catch(err => console.error(`Failed to find document: ${err}`));
+    })();
+  });
 })
 
 // Discord rich presence

@@ -13,9 +13,6 @@ body {
   width: 100%;
   height: 2.5rem;
 }
-.container {
-  margin: auto;
-}
 .item {
   flex-basis: 100%;
   background-color:#2E4272;
@@ -29,6 +26,273 @@ body {
 }
 .selected {
   background-color: #4F628E;
+}
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.reminders {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 71vh;
+  width: 90vw;
+  background-color: #545a66;
+}
+.scroll {
+  flex: 1;  
+  overflow-y: auto;
+}
+.scroll::-webkit-scrollbar-track
+{
+	box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background: transparent;
+}
+
+.scroll::-webkit-scrollbar
+{
+  height: 20px;
+	width: 12px;
+	background: transparent;
+}
+
+.scroll::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
+}
+.icon {
+  height: auto; 
+  width: auto; 
+  max-width: 60px; 
+  max-height: 60px;
+  padding-right: 1rem;
+}
+.iconText {
+  color: white;
+}
+.timer {
+  padding-right: 0.5rem;
+}
+.countdown {
+  flex-basis: 100%;
+  display: none;
+  padding-bottom: 0.5rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.sort {
+  position: absolute;
+  top: -78px;
+  right: 0;
+  display: none;
+  flex-flow: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 12rem;
+  height: 4.5rem;
+  background-color: #545a66;
+  outline: 2px solid black;
+}
+.sortTitle {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+  color: white;
+}
+.sortLabel {
+  color: white;
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+  padding-right: 1rem;
+}
+.sortLabel > input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  margin: 0;
+  width: 1.15em;
+  height: 1.15em;
+  color: white;
+  border: 0.15em solid white;
+  outline: none;
+  border-radius: 0.15em;
+  transform: translate(0.4em, 0.35em);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.sortLabel > input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em white;
+}
+.sortLabel > input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+.reminder {
+  position: relative;
+  flex-basis: 100%;
+  height: 5rem;
+  color: white;
+  outline: 1px solid black;
+  display: flex;
+  align-items: center;
+}
+.reminderDate {
+  padding-left: 1rem;
+  font-family: Optima, sans-serif;
+  font-size: 2.5em;
+  width: 60rem;
+}
+.reminderName {
+  height: 100%;
+  width: 100%;
+  font-size: 1.8vw;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+.overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.911);
+}
+.editDate {
+  padding-left: 1rem;
+  display: none;
+  font-family: Optima, sans-serif;
+  font-weight: bold;
+  font-size: 1em;
+  width: 15rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  height: 100%;
+  color: white;
+}
+.editDate::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+.editName {
+  display: none;
+  height: 100%;
+  flex: 1;
+  padding-left: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1.8vw;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: white;
+}
+.editName::placeholder {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1.9vw;
+  color: rgba(255, 255, 255, 0.9);
+}
+.edit {
+  position: absolute;
+  right: 65px;
+  height: auto; 
+  width: auto; 
+  max-width: 50px; 
+  max-height: 50px;
+}
+.delete {
+  position: absolute;
+  right: 10px;
+  height: auto; 
+  width: auto; 
+  max-width: 50px; 
+  max-height: 50px;
+}
+.addContainer {
+  display: none;
+  height: 2rem;
+}
+.add {
+  display: flex;
+  background-color: #2222272c;
+  position: absolute;
+  bottom: 0;
+  height: 2rem;
+  width: 100%;
+}
+.nameInput {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  outline: none;
+  height: 100%;
+  flex-grow: 100;
+  color: white;
+}
+.nameInput::placeholder {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  padding-left: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+.nameInput:focus::placeholder {
+  color: transparent;
+}
+.dateInput {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+  outline: none;
+  height: 100%;
+  width: 12rem;
+  color: white;
+}
+.dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+.roleSelect {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: transparent;
+  border: none;
+  outline: none;
+  height: 100%;
+  width: 8rem;
+  color: white;
+}
+.roleSelect option {
+  background-color: #545a66;
+}
+.addButton {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  background-color: #0101022c;
+  border: none;
+  width: 8rem;
+  height: 100%;
+  color: white;
+}
+.addButton:hover {
+  background-color: #30305f2c;
 }
 footer {
   display: flex; 

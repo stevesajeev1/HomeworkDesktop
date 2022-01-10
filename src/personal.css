@@ -79,7 +79,7 @@ body {
 }
 .countdown {
   flex-basis: 100%;
-  display: flex;
+  display: none;
   padding-bottom: 0.5rem;
   height: 2rem;
   align-items: center;

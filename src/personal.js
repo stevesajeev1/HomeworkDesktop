@@ -33,8 +33,8 @@ var personal;
 ipcRenderer.on('personalReply', (event, arg, arg2) => {
     // delete previous elements
     var prevReminders = document.getElementsByClassName("reminder");
-    for (var i = 0; i < prevReminders.length; i++) {
-        prevReminders[i].remove();
+    while (prevReminders[0]) {
+        prevReminders[0].remove();
     }
     if (timer != null) {
         clearInterval(timer);
@@ -49,11 +49,6 @@ ipcRenderer.on('personalReply', (event, arg, arg2) => {
         document.getElementById('none').style.display = 'flex';
         document.getElementById('countdown').style.display = 'none';
     } else {
-        // delete any previous reminders
-        var prevReminders = document.getElementsByClassName("reminder");
-        for (var i = 0; i < prevReminders.length; i++) {
-            prevReminders[i].remove();
-        }
         // create new elements
         for (var i = 0; i < personal.length; i++) {
             const date = new Date(personal[i].date);
@@ -227,7 +222,7 @@ enforceDate = function(event) {
 }
 
 function enforceStopEdit(index) {
-    var element = document.getElementById("0");
+    var element = document.getElementById(index);
     if (editing[index] == true) {
         editing[index] = false;
         element.querySelector(".overlay").style.visibility = 'hidden';
@@ -241,10 +236,6 @@ function enforceStopEdit(index) {
 
 function proper(time) {
     return ("0" + time).slice(-2);
-}
-
-function resizeFont() {
-
 }
 
 global.overlay = overlay;

@@ -4,8 +4,8 @@ ipcRenderer.on('startupReply', (event, arg, arg2) => {
     document.getElementById('check').checked = arg;
     // delete any previous roles
     var prevRoles = document.getElementsByClassName("role");
-    for (var i = 0; i < prevRoles.length; i++) {
-        prevRoles[i].remove();
+    while (prevRoles[0]) {
+        prevRoles[0].remove();
     }
     // create new elements
     for (var i = 0; i < arg2.length; i++) {
@@ -34,7 +34,6 @@ ipcRenderer.on('startupReply', (event, arg, arg2) => {
         // create role name
         let name = document.createElement("h4");
         name.setAttribute("class", "roleName");
-        name.setAttribute("charset", "UTF-8");
         name.innerHTML = roleName;
         role.appendChild(name);
 

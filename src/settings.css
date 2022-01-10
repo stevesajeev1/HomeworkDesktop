@@ -147,8 +147,9 @@ body {
   color: white;
   border: 0.15em solid white;
   border-radius: 0.15em;
-  display: grid;
-  place-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .roleCheck > input[type="checkbox"]::before {
   content: "";
