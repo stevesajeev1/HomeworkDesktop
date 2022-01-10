@@ -24,9 +24,13 @@ ipcRenderer.on('startupReply', (event, arg, arg2) => {
         // create check mark
         let label = document.createElement("label");
         label.setAttribute("class", "roleCheck");
+        label.setAttribute("for", "roleCheck");
         let input = document.createElement("input");
         input.setAttribute("type", "checkbox");
-        input.checked = checked;
+        input.setAttribute("id", "roleCheck");
+        if (checked) {
+            input.click();
+        }
         input.onchange = check;
         label.appendChild(input);
         role.appendChild(label);
